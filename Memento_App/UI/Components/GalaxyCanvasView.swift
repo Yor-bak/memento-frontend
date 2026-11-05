@@ -15,6 +15,7 @@ public struct GalaxyCanvasView: View {
     public let nodes: [StarNode]
     public let links: [ConstellationLink]
     public let onSelectNode: (StarNode) -> Void
+    public var onSelectPlanet: (() -> Void)? = nil
     
     // Estados de gestos y navegación por el cosmos
     @State private var currentScale: CGFloat = 1.0
@@ -28,11 +29,13 @@ public struct GalaxyCanvasView: View {
     public init(
         nodes: [StarNode],
         links: [ConstellationLink],
-        onSelectNode: @escaping (StarNode) -> Void
+        onSelectNode: @escaping (StarNode) -> Void,
+        onSelectPlanet: (() -> Void)? = nil
     ) {
         self.nodes = nodes
         self.links = links
         self.onSelectNode = onSelectNode
+        self.onSelectPlanet = onSelectPlanet
     }
     
     private var totalScale: CGFloat {
@@ -100,6 +103,12 @@ public struct GalaxyCanvasView: View {
                         }
                         .position(node.point)
                     }
+                    
+                    // 3. Nodo Celestial Permanente: Planeta de Ayuda y Salud Mental
+                    PlanetNodeView(size: 64) {
+                        onSelectPlanet?()
+                    }
+                    .position(x: -150, y: -165)
                 }
                 .frame(width: proxy.size.width, height: proxy.size.height)
                 .offset(x: center.x + totalOffset.width, y: center.y + totalOffset.height)
