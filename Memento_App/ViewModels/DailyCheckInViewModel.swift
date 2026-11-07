@@ -28,15 +28,20 @@ public final class DailyCheckInViewModel {
         public let emoji: String
         public let label: String
         public let color: Color
+
+        /// Catálogo oficial de estados de ánimo, expuesto como fuente única de verdad para que
+        /// otras pantallas (p. ej. las estadísticas del Gatito Espacial) puedan reutilizarlo
+        /// sin necesidad de instanciar este ViewModel.
+        public static let catalog: [MoodOption] = [
+            MoodOption(id: 1, emoji: "🌧️", label: "Agobiado", color: Color(red: 0.55, green: 0.60, blue: 0.75)),
+            MoodOption(id: 2, emoji: "☁️", label: "Melancólico", color: Color(red: 0.65, green: 0.70, blue: 0.85)),
+            MoodOption(id: 3, emoji: "🌱", label: "Sereno", color: Color(red: 0.60, green: 0.85, blue: 0.70)),
+            MoodOption(id: 4, emoji: "☀️", label: "Esperanzado", color: Color(red: 0.95, green: 0.80, blue: 0.50)),
+            MoodOption(id: 5, emoji: "✨", label: "En Plenitud", color: Color(red: 0.85, green: 0.75, blue: 0.95))
+        ]
     }
-    
-    public let moodOptions: [MoodOption] = [
-        MoodOption(id: 1, emoji: "🌧️", label: "Agobiado", color: Color(red: 0.55, green: 0.60, blue: 0.75)),
-        MoodOption(id: 2, emoji: "☁️", label: "Melancólico", color: Color(red: 0.65, green: 0.70, blue: 0.85)),
-        MoodOption(id: 3, emoji: "🌱", label: "Sereno", color: Color(red: 0.60, green: 0.85, blue: 0.70)),
-        MoodOption(id: 4, emoji: "☀️", label: "Esperanzado", color: Color(red: 0.95, green: 0.80, blue: 0.50)),
-        MoodOption(id: 5, emoji: "✨", label: "En Plenitud", color: Color(red: 0.85, green: 0.75, blue: 0.95))
-    ]
+
+    public let moodOptions: [MoodOption] = MoodOption.catalog
     
     public init() {}
     

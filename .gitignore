@@ -41,3 +41,14 @@ fastlane/test_output
 *~
 *.swp
 *.bak
+
+# --- AI --- 
+
+# Agentes de IA (Claude Code y Codex)
+.claude/
+.codex/
+CLAUDE.local.md
+
+# Editores
+.vscode/
+.idea/

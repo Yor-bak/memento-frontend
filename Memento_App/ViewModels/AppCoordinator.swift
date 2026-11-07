@@ -48,22 +48,11 @@ public final class AppCoordinator {
     }
     
     // MARK: - Evaluación del Estado Inicial
-    /// Evalúa el perfil de usuario almacenado para determinar si debe mostrarse Onboarding, Pantalla de Bloqueo o la Galaxia.
+    /// Siempre arranca en el flujo de primer lanzamiento (Onboarding), para que todas las pantallas
+    /// introductorias se muestren en cada apertura de la app, sin importar el perfil almacenado.
     @MainActor
     public func evaluateInitialState(userProfile: UserProfile?) {
-        guard let profile = userProfile, profile.hasCompletedOnboarding else {
-            currentState = .firstLaunch(.welcome)
-            return
-        }
-        
-        selectedCategoryForSession = profile.currentCategory
-        
-        // Si tiene PIN configurado o biometría activa, la app arranca bloqueada
-        if profile.pinCode != nil || profile.isBiometricsEnabled {
-            currentState = .locked
-        } else {
-            decidePostAuthenticationDestination(profile: profile)
-        }
+        currentState = .firstLaunch(.welcome)
     }
     
     // MARK: - Transiciones de Primer Lanzamiento

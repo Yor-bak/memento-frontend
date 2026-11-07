@@ -13,8 +13,9 @@ import SwiftData
 /// - Cabecera exterior con título tipográfico de grabado ("MEMENTO") y acceso a Ajustes.
 /// - Marco tipo passepartout / lámina de acuarela con elevación y doble bisel artesanal.
 /// - Lienzo cósmico interactivo confinado con Pan, Zoom, Gatito Espacial y el nodo permanente "Planeta".
-/// - Apertura automática de `GraphOnboardingView` en la primera visita (`hasSeenGraphOnboarding = false`).
+/// - Apertura automática de `GraphOnboardingView` en cada visita.
 /// - Integración con el directorio de psicólogos mediante `HelpPlanetSheetView` y `PsychologistsDirectoryView`.
+/// - Hoja del Compañero Cósmico (`CatCompanionSheetView`) al pulsar el Gatito Espacial: racha, estadísticas y prediagnóstico.
 public struct GalaxyHomeView: View {
     public let userProfile: UserProfile
     public var onLockApp: (() -> Void)? = nil
@@ -22,15 +23,16 @@ public struct GalaxyHomeView: View {
     
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \StarNode.date, order: .forward) private var starNodes: [StarNode]
-    
+    @Query(sort: \DailyEntry.timestamp, order: .forward) private var dailyEntries: [DailyEntry]
+
     @State private var viewModel = GalaxyViewModel()
-    
+
     // Control de Onboarding Didáctico de Constelaciones
-    @AppStorage("hasSeenGraphOnboarding") private var hasSeenGraphOnboarding: Bool = false
     @State private var isShowingGraphOnboarding: Bool = false
-    
+
     // Hojas y Navegación
     @State private var isHelpPlanetPresented: Bool = false
+    @State private var isCompanionSheetPresented: Bool = false
     @State private var isDirectoryPresented: Bool = false
     @State private var isSettingsPresented: Bool = false
     @State private var bookedAppointmentPayload: AppointmentBookingPayload? = nil
@@ -88,11 +90,16 @@ public struct GalaxyHomeView: View {
             }
             .presentationDetents([.medium])
         }
+        // Hoja del Compañero Cósmico al pulsar el Gatito Espacial: racha, estadísticas y prediagnóstico
+        .sheet(isPresented: $isCompanionSheetPresented) {
+            CatCompanionSheetView(dailyEntries: dailyEntries, starNodes: starNodes)
+                .presentationDetents([.large])
+        }
         // Hoja de Ajustes y Privacidad de Datos Compartidos
         .sheet(isPresented: $isSettingsPresented) {
             SettingsView()
         }
-        // Onboarding de Constelaciones (se dispara en el primer arribo a GalaxyHomeView)
+        // Onboarding de Constelaciones (se dispara en cada arribo a GalaxyHomeView)
         .sheet(isPresented: $isShowingGraphOnboarding) {
             GraphOnboardingView {
                 isShowingGraphOnboarding = false
@@ -110,12 +117,10 @@ public struct GalaxyHomeView: View {
             viewModel.seedInitialUniverseIfNeeded(modelContext: modelContext)
             viewModel.refreshConstellations(from: starNodes)
             
-            // Presentar onboarding didáctico si es la primera vez que ingresa a la Galaxia
-            if !hasSeenGraphOnboarding {
-                // Pequeño retardo suave para permitir que cargue la interfaz visual
-                try? await Task.sleep(nanoseconds: 350_000_000)
-                isShowingGraphOnboarding = true
-            }
+            // Presentar siempre el onboarding didáctico al ingresar a la Galaxia
+            // Pequeño retardo suave para permitir que cargue la interfaz visual
+            try? await Task.sleep(nanoseconds: 350_000_000)
+            isShowingGraphOnboarding = true
         }
         .onChange(of: starNodes) { _, newNodes in
             viewModel.refreshConstellations(from: newNodes)
@@ -185,6 +190,9 @@ public struct GalaxyHomeView: View {
                 },
                 onSelectPlanet: {
                     isHelpPlanetPresented = true
+                },
+                onSelectCat: {
+                    isCompanionSheetPresented = true
                 }
             )
             .clipShape(RoundedRectangle(cornerRadius: 24))

@@ -16,26 +16,29 @@ public struct GalaxyCanvasView: View {
     public let links: [ConstellationLink]
     public let onSelectNode: (StarNode) -> Void
     public var onSelectPlanet: (() -> Void)? = nil
-    
+    public var onSelectCat: (() -> Void)? = nil
+
     // Estados de gestos y navegación por el cosmos
     @State private var currentScale: CGFloat = 1.0
     @State private var gestureScale: CGFloat = 1.0
     @State private var currentPanOffset: CGSize = .zero
     @State private var gesturePanOffset: CGSize = .zero
-    
+
     // Animación de centelleo de estrellas de fondo
     @State private var twinklePhase: Double = 0.0
-    
+
     public init(
         nodes: [StarNode],
         links: [ConstellationLink],
         onSelectNode: @escaping (StarNode) -> Void,
-        onSelectPlanet: (() -> Void)? = nil
+        onSelectPlanet: (() -> Void)? = nil,
+        onSelectCat: (() -> Void)? = nil
     ) {
         self.nodes = nodes
         self.links = links
         self.onSelectNode = onSelectNode
         self.onSelectPlanet = onSelectPlanet
+        self.onSelectCat = onSelectCat
     }
     
     private var totalScale: CGFloat {
@@ -109,21 +112,20 @@ public struct GalaxyCanvasView: View {
                         onSelectPlanet?()
                     }
                     .position(x: -150, y: -165)
+
+                    // 4. Nodo Celestial Permanente: Gatito Espacial, compañero y acceso a tus insights
+                    Button(action: {
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                        onSelectCat?()
+                    }) {
+                        SpaceCatView(size: 60)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .position(x: 150, y: -165)
                 }
                 .frame(width: proxy.size.width, height: proxy.size.height)
                 .offset(x: center.x + totalOffset.width, y: center.y + totalOffset.height)
                 .scaleEffect(totalScale)
-                
-                // 3. Mascota: Gatito Espacial flotando DENTRO del grafo cósmico
-                VStack {
-                    HStack {
-                        SpaceCatView(size: 52, isCompact: true)
-                            .padding(.top, 16)
-                            .padding(.leading, 16)
-                        Spacer()
-                    }
-                    Spacer()
-                }
             }
             .contentShape(Rectangle())
             .gesture(panGesture)
